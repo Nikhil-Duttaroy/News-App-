@@ -22,6 +22,7 @@ const DiscoverScreen = () => {
   return (
     <View style={styles.discover}>
       <Search />
+
       <Text
         style={{ ...styles.subtitle, color: darkTheme ? "white" : "black" }}
       >

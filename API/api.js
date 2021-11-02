@@ -63,24 +63,24 @@ export const country = [
 
 export const sources = [
   {
-    id: "bbc-news",
-    name: "BBC News",
-    pic: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/BBC_News_2019.svg/1200px-BBC_News_2019.svg.png",
-  },
-  {
     id: "cnn",
     name: "CNN",
     pic: "https://bankimooncentre.org/wp-content/uploads/2020/06/cnn-logo-square.png",
   },
   {
-    id: "fox-news",
-    name: "Fox News",
-    pic: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Fox_News_Channel_logo.svg/768px-Fox_News_Channel_logo.svg.png",
+    id: "bbc-news",
+    name: "BBC News",
+    pic: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/BBC_News_2019.svg/1200px-BBC_News_2019.svg.png",
   },
   {
     id: "google-news",
     name: "Google News",
     pic: "https://upload.wikimedia.org/wikipedia/commons/0/0b/Google_News_icon.png",
+  },
+  {
+    id: "fox-news",
+    name: "Fox News",
+    pic: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Fox_News_Channel_logo.svg/768px-Fox_News_Channel_logo.svg.png",
   },
 ];
 
@@ -100,6 +100,8 @@ export const getNewsAPI = (category, country = "in") => {
 export const getSourceAPI = (source) => {
   return `${BASE_URL}/everything/${source}.json`;
 };
+
+  // const API_KEY = "b36e0e4bb83c8a51d442ff695647cee4";
 
 
 // 2dda6b301d3f4c97b306a701e1c3c028

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   KeyboardAvoidingView,
   StyleSheet,
@@ -6,18 +6,36 @@ import {
   TextInput,
   TouchableOpacity,
   View,
+  StatusBar,
 } from "react-native";
 
 import { auth } from "../firebase";
 
 import { useNavigation } from "@react-navigation/core";
+import { NewsContext } from "./../API/Context";
+
 
 const RegisterScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState(false);
+  const [password1, setPassword1] = useState("");
+  const [showPassword, setShowPassword] = useState(true);
+  const [showPassword1, setShowPassword1] = useState(true);
+
+  
 
   const navigation = useNavigation();
+    const darkTheme = useContext(NewsContext);
+
+const handleValidation=()=>{
+  if (password===password1) handleSignup()
+  else {
+    alert("Passwords Dont Match")
+    setEmail("")
+    setPassword("")
+    setPassword1("")  
+  }
+}
 
   const handleSignup = () => {
     auth
@@ -25,7 +43,7 @@ const RegisterScreen = () => {
       .then((userCredentials) => {
         const user = userCredentials.user;
         console.log("Registered with:", user.email);
-        alert("Registration Successful : ", user.email);
+        alert("Registration Successful");
         navigation.replace("Login");
 
       })
@@ -34,38 +52,142 @@ const RegisterScreen = () => {
 
   return (
     <KeyboardAvoidingView
-      style={styles.container}
+      style={{
+        flex: 1,
+        backgroundColor: darkTheme ? "#282C35" : "white",
+        padding: 20,
+        justifyContent: "center",
+        marginTop: StatusBar.currentHeight,
+      }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.inputContainer}>
-        <Text
-          adjustsFontSizeToFit
-          style={{ textAlign: "center", fontSize: 30, paddingVertical: 10 }}
-        >
-          Register
-        </Text>
+      <Text
+        style={{
+          fontSize: 25,
+          marginTop: 20,
+          color: !darkTheme ? "#282C35" : "white",
+        }}
+      >
+        Create Your Account!{" "}
+      </Text>
+
+      <Text style={{ fontSize: 16, color: "gray", marginTop: 20 }}>
+        Sign Up to continue
+      </Text>
+      <TextInput
+        style={{
+          marginTop: 40,
+          borderBottomColor: "#ddd",
+          borderBottomWidth: 1,
+          paddingBottom: 20,
+          color: "#ddd",
+        }}
+        placeholderTextColor={!darkTheme ? "#282C35" : "white"}
+        placeholder='Email'
+        value={email}
+        onChangeText={(text) => setEmail(text)}
+      />
+      <View
+        style={{
+          flexDirection: "row",
+          marginTop: 40,
+          borderBottomColor: "#ddd",
+          borderBottomWidth: 1,
+          paddingBottom: 20,
+          justifyContent: "space-between",
+        }}
+      >
         <TextInput
-          placeholder='Email'
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-          style={styles.input}
-        />
-        <TextInput
+          placeholderTextColor={!darkTheme ? "#282C35" : "white"}
           placeholder='Password'
           value={password}
           onChangeText={(text) => setPassword(text)}
-          style={styles.input}
-          secureTextEntry
+          secureTextEntry={showPassword}
         />
+        <TouchableOpacity
+          onPress={() => {
+            setShowPassword((prev) => !prev);
+          }}
+        >
+          <Text style={{ color: "#FFF" }}>
+            {(i = showPassword ? "Show" : "Hide")}
+          </Text>
+        </TouchableOpacity>
       </View>
 
-      <View style={styles.buttonContainer}>
+      <View
+        style={{
+          flexDirection: "row",
+          marginTop: 40,
+          borderBottomColor: "#ddd",
+          borderBottomWidth: 1,
+          paddingBottom: 20,
+          justifyContent: "space-between",
+        }}
+      >
+        <TextInput
+          // style={{
+          //   marginTop: 40,
+          //   borderBottomColor: "#ddd",
+          //   borderBottomWidth: 1,
+          //   paddingBottom: 20,
+          // }}
+          placeholderTextColor={!darkTheme ? "#282C35" : "white"}
+          placeholder='Confirm Password'
+          value={password1}
+          onChangeText={(text) => setPassword1(text)}
+          secureTextEntry={showPassword1}
+        />
         <TouchableOpacity
-          onPress={handleSignup}
-          style={[styles.button, styles.buttonOutline]}
+          onPress={() => {
+            setShowPassword1((prev) => !prev);
+          }}
         >
-          <Text style={styles.buttonOutlineText}>Register</Text>
+          <Text style={{ color: "#FFF" }}>
+            {(i = showPassword1 ? "Show" : "Hide")}
+          </Text>
         </TouchableOpacity>
+      </View>
+
+      <View
+        style={{
+          alignItems: "center",
+          justifyContent: "center",
+          marginTop: 40,
+        }}
+      >
+        <TouchableOpacity
+          style={{
+            width: 200,
+            backgroundColor: "#0d47a1",
+            padding: 10,
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 40,
+            marginTop: 30,
+          }}
+          onPress={handleValidation}
+        >
+          <Text style={{ textAlign: "center", color: "#FFF", fontSize: 16 }}>
+            Sign Up
+          </Text>
+        </TouchableOpacity>
+
+        <View style={{ flexDirection: "row", marginTop: 40 }}>
+          <Text style={{ color: "gray" }}>Already Have a account?</Text>
+          <Text
+            style={{
+              fontWeight: "bold",
+              color: !darkTheme ? "#282C35" : "white",
+            }}
+            onPress={() => {
+              navigation.replace("Login");
+            }}
+          >
+            {" "}
+            Sign In
+          </Text>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -73,49 +195,4 @@ const RegisterScreen = () => {
 
 export default RegisterScreen;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  inputContainer: {
-    width: "80%",
-  },
-  input: {
-    backgroundColor: "white",
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    borderRadius: 10,
-    marginTop: 5,
-  },
-  buttonContainer: {
-    width: "60%",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 40,
-  },
-  button: {
-    backgroundColor: "#0782F9",
-    width: "100%",
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  buttonOutline: {
-    backgroundColor: "white",
-    marginTop: 5,
-    borderColor: "#0782F9",
-    borderWidth: 2,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-  buttonOutlineText: {
-    color: "#0782F9",
-    fontWeight: "700",
-    fontSize: 16,
-  },
-});
+

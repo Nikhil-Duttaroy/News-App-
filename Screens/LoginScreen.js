@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import {
   KeyboardAvoidingView,
   StyleSheet,
@@ -6,34 +6,100 @@ import {
   TextInput,
   TouchableOpacity,
   View,
-  w,
+  StatusBar,
+  Switch,
 } from "react-native";
 
 import { auth } from "../firebase";
 
 import { useNavigation } from "@react-navigation/core";
+import { NewsContext } from './../API/Context';
+
 
 const LoginScreen = () => {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [user, setUser] = useState(false);
+  const { latitude } = useContext(NewsContext);
+  const { longitude } = useContext(NewsContext);
+  // const { address } = useContext(NewsContext);
+  const { city } = useContext(NewsContext);
+  const { temp } = useContext(NewsContext);
+  // const { country } = useContext(NewsContext);
+ 
 
-    const navigation = useNavigation();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(true);
 
 
-    const handleLogin = () => {
-        auth
-          .signInWithEmailAndPassword(email, password)
-          .then((userCredentials) => {
-            const user = userCredentials.user;
-            console.log("Logged in with:", user.email);
-          })
-          .catch((error) => alert(error.message));
+  const navigation = useNavigation();
+  const darkTheme = useContext(NewsContext);
+
+  const handleLogin = () => {
+    if(email && password){
+      auth
+        .signInWithEmailAndPassword(email, password)
+        .then((userCredentials) => {
+          const user = userCredentials.user;
+          console.log("Logged in with:", user.email);
+          navigation.replace("Home");
+        })
+        .catch((error) => {
+          alert("Incorrect Email or Password,Please Try Again")
+          setEmail("")
+          setPassword("")
+        });
     }
+    else{
+      alert("Enter Email and Password")
+      setEmail("");
+      setPassword("");
+    }
+  };
+  
+
+  let color;
+  if(temp>=35) color = "red";
+  else if (temp>=25 && temp<35) color = "orange";
+  else color="blue"
 
   return (
-    <View style={styles.container}>
-      <Text style={{ fontSize: 25, marginTop: 20 }}>Welcome Back! </Text>
+    <KeyboardAvoidingView
+      // style={styles.container}
+      style={{
+        flex: 1,
+        backgroundColor: darkTheme ? "#282C35" : "white",
+        padding: 20,
+        justifyContent: "center",
+        marginTop: StatusBar.currentHeight,
+      }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
+      {/* <Text
+        style={{
+          // fontSize: 25,
+          // marginTop: 20,
+          color: !darkTheme ? "#282C35" : "white",
+        }}
+      >
+        Lat:{latitude}
+      </Text>
+      <Text
+        style={{
+          // fontSize: 25,
+          // marginTop: 20,
+          color: !darkTheme ? "#282C35" : "white",
+        }}
+      >
+        Long:{longitude}
+      </Text> */}
+      <Text
+        style={{
+          fontSize: 25,
+          marginTop: 20,
+          color: !darkTheme ? "#282C35" : "white",
+        }}
+      >
+        Welcome Back!!{" "}
+      </Text>
 
       <Text style={{ fontSize: 16, color: "gray", marginTop: 20 }}>
         Sign in to continue
@@ -44,24 +110,47 @@ const LoginScreen = () => {
           borderBottomColor: "#ddd",
           borderBottomWidth: 1,
           paddingBottom: 20,
+          color: "#ddd",
+          
         }}
+        placeholderTextColor={!darkTheme ? "#282C35" : "white"}
         placeholder='Email'
         value={email}
         onChangeText={(text) => setEmail(text)}
       />
-
-      <TextInput
+      <View
         style={{
+          flexDirection: "row",
           marginTop: 40,
           borderBottomColor: "#ddd",
           borderBottomWidth: 1,
           paddingBottom: 20,
+          justifyContent: "space-between",
         }}
-        placeholder='Password'
-        value={password}
-        onChangeText={(text) => setPassword(text)}
-        secureTextEntry={true}
-      />
+      >
+        <TextInput
+          // style={{
+          //   marginTop: 40,
+          //   borderBottomColor: "#ddd",
+          //   borderBottomWidth: 1,
+          //   paddingBottom: 20,
+          // }}
+          placeholderTextColor={!darkTheme ? "#282C35" : "white"}
+          placeholder='Password'
+          value={password}
+          onChangeText={(text) => setPassword(text)}
+          secureTextEntry={showPassword}
+        />
+        <TouchableOpacity
+          onPress={() => {
+            setShowPassword((prev) => !prev);
+          }}
+        >
+          <Text style={{ color: "#FFF" }}>
+            {(i = showPassword ? "Show" : "Hide")}
+          </Text>
+        </TouchableOpacity>
+      </View>
 
       <View
         style={{
@@ -87,7 +176,7 @@ const LoginScreen = () => {
           </Text>
         </TouchableOpacity>
 
-        <View style={{ flexDirection: "row", marginTop: 60 }}>
+        {/* <View style={{ flexDirection: "row", marginTop: 60 }}>
           <View
             style={{
               height: 40,
@@ -131,12 +220,15 @@ const LoginScreen = () => {
               in
             </Text>
           </View>
-        </View>
+        </View> */}
 
         <View style={{ flexDirection: "row", marginTop: 40 }}>
           <Text style={{ color: "gray" }}>Don't have an account?</Text>
           <Text
-            style={{ fontWeight: "bold" }}
+            style={{
+              fontWeight: "bold",
+              color: !darkTheme ? "#282C35" : "white",
+            }}
             onPress={() => {
               navigation.replace("Register");
             }}
@@ -145,8 +237,17 @@ const LoginScreen = () => {
             Sign Up
           </Text>
         </View>
+        <Text
+          style={{
+            // fontSize: 25,
+            marginTop: 20,
+            color: color,
+          }}
+        >
+          {temp ?`Current Temperature In ${city} : ${temp}°C` : ""}
+        </Text>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 
@@ -154,18 +255,11 @@ const LoginScreen = () => {
 
 export default LoginScreen;
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#FFF",
-    padding: 20,
-    justifyContent: "center",
-  },
-  image: {
-    width: 400,
-    height: 250,
-    // marginVertical: 10,
-    resizeMode: "cover",
-  },
-  
-});
+// const styles = StyleSheet.create({
+//   image: {
+//     width: 400,
+//     height: 250,
+//     // marginVertical: 10,
+//     resizeMode: "cover",
+//   },
+// });
